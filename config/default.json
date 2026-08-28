@@ -1,0 +1,12 @@
+{
+  "sa": {
+    "time_limit": 60,
+    "random_seed": 42,
+    "initial_temperature": 100.0,
+    "cooling_rate": 0.995,
+    "minimum_temperature": 0.01,
+    "max_iterations": 200000,
+    "neighbor_attempts": 60,
+    "objective_mode": "distance"
+  }
+}
