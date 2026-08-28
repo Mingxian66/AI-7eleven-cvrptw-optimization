@@ -1,6 +1,6 @@
 # AI-Based 7-Eleven Retail Replenishment Vehicle Route Optimization
 
-This repository contains the implementation for a Master's research project on **Capacitated Vehicle Routing Problem with Time Windows (CVRPTW)** for retail replenishment.
+This repository contains the implementation for a research project on **Capacitated Vehicle Routing Problem with Time Windows (CVRPTW)** for retail replenishment.
 
 The study compares three practical routing approaches under common problem inputs, feasibility rules, and computational budgets:
 
@@ -154,11 +154,7 @@ For formal experiments, the project is designed to use:
 - independent feasibility verification before solution-quality comparison
 - versioned result files
 
-The initial results under `results/sa_first_benchmark/` are development-stage outputs and should not be treated as the final thesis results.
-
-## Naming convention
-
-Variables and functions use lowercase English `snake_case`. Python classes use `PascalCase`.
+The initial results under `results/sa_first_benchmark/` are development-stage outputs and are not the final thesis results.
 
 ## Academic-use notice
 
