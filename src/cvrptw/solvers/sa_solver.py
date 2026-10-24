@@ -1,4 +1,5 @@
 from __future__ import annotations
+from ..evaluation.common_objective import vehicle_penalty, objective_value
 
 import math
 import random
@@ -335,17 +336,11 @@ class SaSolver:
         return self.random.random() < probability
 
     def _calculate_vehicle_penalty(self) -> float:
-        instance = self._require_instance()
-        max_edge = max(max(row) for row in instance.distance_matrix)
-        return max_edge * (instance.customer_count + instance.vehicle_count + 1) + 1.0
+        return vehicle_penalty(self._require_instance())
 
     def _objective_value(self, solution: list[list[int]]) -> float:
-        distance = self.total_distance(solution)
-
-        if self.objective_mode == "distance":
-            return distance
-
-        return len(solution) * self.vehicle_penalty + distance
+        return objective_value(len(solution), self.total_distance(solution),
+                               self.objective_mode, self.vehicle_penalty)
 
     def is_feasible_solution(self, solution: list[list[int]]) -> bool:
         instance = self._require_instance()
