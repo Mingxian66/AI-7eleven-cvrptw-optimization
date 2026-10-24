@@ -1,10 +1,7 @@
-# Results Directory
+# Published benchmark results
 
-This directory stores versioned experiment outputs that are useful for reproducibility.
+- `p2_solomon_formal_60s_verified/`: C101, R101, RC101, five repeats per algorithm, 45 route JSON files.
+- `p2_solomon_expansion_60s/`: C102, R102, RC102, five repeats per algorithm, 45 route JSON files.
+- `solomon_six_instance_analysis/`: combined English summary and BKS figures.
 
-Current included outputs:
-
-- `sa_first_benchmark/sa_first_benchmark_summary.csv`
-- `sa_first_benchmark/sa_first_benchmark_detailed.json`
-
-These are **initial development-stage SA benchmark results**, not the final thesis experiment results. Formal comparisons will later use repeated stochastic runs and the same experimental settings across the implemented methods.
+Use `python -m src.cvrptw.experiments.verify_saved_routes --output-dir <directory>` to independently recheck the route JSON files. Original experimental outputs should not be edited.

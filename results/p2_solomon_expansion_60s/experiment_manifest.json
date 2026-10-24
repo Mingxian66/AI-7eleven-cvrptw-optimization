@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "created_utc": "2026-10-23T16:30:26.648266+00:00",
+  "instances": [
+    "data/solomon/C102.txt",
+    "data/solomon/R102.txt",
+    "data/solomon/RC102.txt"
+  ],
+  "seeds": [
+    11,
+    22,
+    33,
+    44,
+    55
+  ],
+  "time_limit_seconds": 60.0,
+  "population_size": 24,
+  "ortools_repeats": 5,
+  "objective": "lexicographic: vehicles then distance",
+  "note": "OR-Tools repeats use a fixed search configuration; seed is not varied."
+}
