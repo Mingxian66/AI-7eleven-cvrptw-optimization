@@ -1,165 +1,80 @@
 # AI-Based 7-Eleven Retail Replenishment Vehicle Route Optimization
 
-This repository contains the implementation for a research project on **Capacitated Vehicle Routing Problem with Time Windows (CVRPTW)** for retail replenishment.
+Master's research implementation of the **Capacitated Vehicle Routing Problem with Time Windows (CVRPTW)**. The current completed stage compares **Simulated Annealing (SA)**, **Genetic Algorithm (GA)**, and **Google OR-Tools Routing Solver** on six Solomon 100-customer instances. A semi-synthetic Petaling Jaya 7-Eleven case study is **planned, not yet completed**.
 
-The study compares three practical routing approaches under common problem inputs, feasibility rules, and computational budgets:
+## Current research status (24 October 2026)
 
-- Simulated Annealing (SA)
-- Genetic Algorithm (GA)
-- Google OR-Tools
+- Implemented SA (relocate, exchange, intra-route 2-opt), GA, and OR-Tools solvers with a shared input model.
+- Completed 60-second experiments on **C101, C102, R101, R102, RC101, RC102**.
+- Ran **five repetitions per solver and instance: 6 × 3 × 5 = 90 runs**. SA and GA use seeds 11, 22, 33, 44, 55; OR-Tools uses a fixed search configuration repeated five times (**not five different seeds**).
+- Saved **90 route JSON files** and experiment manifests; all 90 routes passed the project's independent feasibility verifier (zero reported errors).
+- Used the **lexicographic benchmark objective: minimize number of vehicles first, then total Euclidean distance**.
+- These are heuristic/computational results, **not proofs of optimality**. Best-known solutions (BKS) are reference values, not necessarily certified optima.
 
-A semi-synthetic Petaling Jaya retail case will later be used to compare optimized routes with a transparent cluster-first operational baseline. The repository is being developed incrementally alongside the research project.
-
-## Current implementation status
-
-The current public version contains a working **neighborhood-based SA benchmark** plus the shared CVRPTW data and evaluation framework. GA and OR-Tools are currently scaffolded and will be implemented in later updates.
-
-Completed components include:
-
-- common `CvrptwInstance` and `SolverResult` structures
-- Solomon benchmark loader
-- Solomon input validation
-- distance and travel-time matrix support
-- SA with `relocate`, `exchange`, and `two_opt` neighborhoods
-- hard capacity and time-window feasibility checking
-- fixed random seeds
-- wall-clock time limits
-- common evaluation metrics
-- automated unit tests
-- initial SA benchmark outputs for C101, R101, and RC101
-
-For a detailed development checklist, see [`docs/PROJECT_STATUS.md`](docs/PROJECT_STATUS.md).
-
-## Research design
-
-The project follows two main experimental stages.
-
-**Stage A — Solomon benchmark**
-
-SA, GA, and OR-Tools will be tested on the same Solomon CVRPTW instances. Vehicle count is considered before travel distance when benchmark results are interpreted. Solution feasibility, distance, runtime, gap to reference results, and stochastic robustness are evaluated.
-
-**Stage B — Petaling Jaya case study**
-
-The same routing methods will be applied to selected 7-Eleven store locations in Petaling Jaya using road-network distance and travel-time matrices. Demand, service time, and delivery windows will be generated transparently because proprietary company replenishment data are not available. A cluster-first rule will provide an operational comparison baseline.
-
-## SA benchmark design
-
-The SA benchmark intentionally uses only three classic neighborhood operators:
-
-1. `relocate` — move a customer to another position or route
-2. `exchange` — swap two customers
-3. `two_opt` — reverse a subsequence inside one route
-
-The implementation does not use ALNS, Or-opt, or route-fusion operators. This keeps the benchmark clear and reproducible.
-
-The solver supports two objective modes:
-
-- `lexicographic`: vehicle count has priority over total distance; intended for Solomon-style comparison
-- `distance`: total distance is minimized under a fixed fleet limit; intended for the Petaling Jaya case
-
-## Repository structure
+## Repository contents
 
 ```text
-AI-7eleven-cvrptw-optimization/
-├── config/
-│   └── default.json
-├── data/
-│   ├── pj/
-│   └── solomon/
-├── docs/
-│   └── PROJECT_STATUS.md
-├── results/
-│   ├── README.md
-│   └── sa_first_benchmark/
-├── src/
-│   └── cvrptw/
-│       ├── evaluation/
-│       │   └── metrics.py
-│       ├── experiments/
-│       │   └── run_sa.py
-│       ├── io/
-│       │   └── solomon.py
-│       ├── solvers/
-│       │   ├── ga_solver.py
-│       │   ├── ortools_solver.py
-│       │   └── sa_solver.py
-│       └── models.py
-├── tests/
-│   ├── test_sa_solver.py
-│   └── test_solomon_loader.py
-├── .gitignore
-├── README.md
-└── requirements.txt
+config/                                  Algorithm configuration
+data/solomon/                            Solomon input instances (including six evaluated cases)
+data/pj/                                 Placeholder for planned case study
+docs/reports/                            Editable English Results and Discussion draft
+docs/                                    Experiment, validation and fairness notes
+src/cvrptw/solvers/                      SA, GA, OR-Tools implementations
+src/cvrptw/evaluation/                   Shared objective and independent validation
+src/cvrptw/experiments/                  Experiment runners and route verification
+src/cvrptw/io/                           Solomon parser
+tests/                                   Automated tests
+results/p2_solomon_formal_60s_verified/  C101, R101, RC101: 45 runs + routes
+results/p2_solomon_expansion_60s/        C102, R102, RC102: 45 runs + routes
+results/solomon_six_instance_analysis/   Consolidated CSV and BKS comparison charts
 ```
 
-## Requirements
+Earlier exploratory runs, IDE configuration, caches, and local temporary files are intentionally excluded from this GitHub release.
 
-The current SA implementation uses Python with NumPy and Pandas.
+## Installation
 
-Install the dependencies with:
+Use Python 3.14 (the environment used for the recorded experiments) or a compatible Python version supported by the installed dependencies:
 
 ```bash
 python -m pip install -r requirements.txt
+python -m unittest discover -s tests
 ```
 
-> The research report plans Python 3.14 for the final experimental environment. The current repository code should be tested in the actual environment used for each formal experiment, and that version should be recorded with the results.
+## Re-run benchmark experiments
 
-## Run the SA benchmark
-
-Example using Solomon C101:
+Run from the **repository root**. Each command is approximately **45 minutes** of solver budget (45 runs × 60 seconds), plus overhead. Use separate output directories to preserve the published records.
 
 ```bash
-python -m src.cvrptw.experiments.run_sa \
-  --instance data/solomon/C101.txt \
-  --time-limit 60 \
-  --seed 42 \
-  --objective-mode lexicographic
+python -m src.cvrptw.experiments.run_comparison --instances data/solomon/C101.txt data/solomon/R101.txt data/solomon/RC101.txt --seeds 11 22 33 44 55 --time-limit 60 --ortools-repeats 5 --output-dir results/reproduction_C101_R101_RC101
+
+python -m src.cvrptw.experiments.run_comparison --instances data/solomon/C102.txt data/solomon/R102.txt data/solomon/RC102.txt --seeds 11 22 33 44 55 --time-limit 60 --ortools-repeats 5 --output-dir results/reproduction_C102_R102_RC102
 ```
 
-To use total distance as the main objective instead:
+## Verify saved routes
 
 ```bash
-python -m src.cvrptw.experiments.run_sa \
-  --instance data/solomon/C101.txt \
-  --time-limit 60 \
-  --seed 42 \
-  --objective-mode distance
+python -m src.cvrptw.experiments.verify_saved_routes --output-dir results/p2_solomon_formal_60s_verified
+python -m src.cvrptw.experiments.verify_saved_routes --output-dir results/p2_solomon_expansion_60s
 ```
 
-## Run tests
+Both published result sets were independently re-validated by the project verifier, with **45 feasible routes and 0 errors** each. This validates implemented constraints; it does not establish optimality.
 
-```bash
-python -m unittest discover -s tests -v
-```
+## Results and interpretation
 
-At the time of this GitHub-ready release, the included test suite contains four tests covering the Solomon loader, SA feasibility behavior, capacity rejection, and seed-based reproducibility.
+See [`results/solomon_six_instance_analysis/`](results/solomon_six_instance_analysis/) for the consolidated results CSV and BKS figures, and [`docs/reports/`](docs/reports/) for the editable English report draft. Comparisons prioritize fleet size; a shorter distance with **more vehicles** is not a better lexicographic result.
 
-## Included benchmark data
+### Limitations
 
-The repository currently includes selected Solomon 100-customer instances from the C, R, and RC groups for research development and validation.
+- Six selected Solomon instances do not establish general superiority across the full benchmark.
+- OR-Tools Routing Solver uses heuristic search, not an exact optimality certificate.
+- OR-Tools fixed-configuration repeats should not be interpreted as varied random-seed trials.
+- Solver costs and timing may differ with hardware, dependencies and runtime conditions.
+- Petaling Jaya road-network matrices, semi-synthetic demand and the operational baseline are future work.
 
-The original Solomon benchmark should be cited in academic work as:
+## Data and references
 
-> Solomon, M. M. (1987). Algorithms for the vehicle routing and scheduling problems with time window constraints. *Operations Research, 35*(2), 254–265. https://doi.org/10.1287/opre.35.2.254
+Solomon VRPTW benchmark data: [Solomon (1987)](https://doi.org/10.1287/opre.35.2.254). Best-known solution reference: [SINTEF VRPTW benchmark](https://www.sintef.no/projectweb/top/vrptw/100-customers/). Source datasets remain attributed to their respective authors; check redistribution conditions before public release.
 
-## Reproducibility notes
+## Repository maintenance
 
-For formal experiments, the project is designed to use:
-
-- the same instance data for all methods
-- the same hard CVRPTW feasibility rules
-- the same wall-clock budget for a given test setting
-- recorded random seeds for SA and GA
-- saved generated scenario files
-- independent feasibility verification before solution-quality comparison
-- versioned result files
-
-The initial results under `results/sa_first_benchmark/` are development-stage outputs and are not the final thesis results.
-
-## Academic-use notice
-
-This repository is made public for academic project visibility and reproducibility. No open-source license has been assigned in this version. Public access does not by itself grant permission to reuse the code beyond rights provided by applicable law.
-
-## Repository updates
-
-The repository will be updated as the GA, OR-Tools, Petaling Jaya dataset workflow, operational baseline, and formal experiments are completed.
+Do not commit passwords, API keys, private customer data, personal paths, IDE caches, or obsolete experiment runs. Keep raw published result folders unchanged; place future runs in new directories.

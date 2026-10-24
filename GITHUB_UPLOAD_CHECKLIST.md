@@ -1,11 +1,10 @@
-# GitHub Upload Checklist
+# GitHub publication checklist
 
-Before uploading or updating the public repository:
-
-- [ ] Run `python -m unittest discover -s tests -v`.
-- [ ] Check that no passwords, API keys, tokens, private URLs, or `.env` files are included.
-- [ ] Remove `__pycache__`, `.pyc`, temporary files, and local IDE settings.
-- [ ] Confirm that generated result files are intended to be public.
-- [ ] Update `README.md` if project status or run commands changed.
-- [ ] Update `docs/PROJECT_STATUS.md` after a major development step.
-- [ ] Use a clear Git commit message describing the change.
+- [ ] Check institution/supervisor rules before publishing research material.
+- [ ] Check Solomon input-data redistribution terms; if necessary remove `data/solomon/*.txt` and document download instructions.
+- [ ] Review report and manifests for personal information and sensitive data.
+- [ ] Run `python -m unittest discover -s tests` locally with OR-Tools installed.
+- [ ] Verify both route folders using the commands in README.
+- [ ] Review `git status` before committing; ensure `.idea`, `__pycache__`, `.env` are excluded.
+- [ ] Upload extracted project **contents**, not the ZIP as a single repository file.
+- [ ] Keep old exploratory results backed up locally; do not overwrite published data.
